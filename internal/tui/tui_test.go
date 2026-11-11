@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 	"testing"
+	"time"
 
 	tea "charm.land/bubbletea/v2"
 	"github.com/charmbracelet/x/ansi"
@@ -18,7 +19,7 @@ import (
 // the screen as text: what a person would read, without the styling.
 func screen(t *testing.T, width, height int, load Loader, msgs ...tea.Msg) string {
 	t.Helper()
-	var m tea.Model = New(load)
+	var m tea.Model = New(load, func() time.Time { return demo.Today })
 	m, _ = m.Update(tea.WindowSizeMsg{Width: width, Height: height})
 	if load != nil {
 		m, _ = m.Update(m.Init()())
@@ -39,7 +40,7 @@ func screen(t *testing.T, width, height int, load Loader, msgs ...tea.Msg) strin
 }
 
 func demoSession(context.Context) (triage.Session, error) {
-	return triage.New(demo.Query, demo.Tasks()), nil
+	return triage.New(demo.Query, demo.Tasks(demo.Today)), nil
 }
 
 var enter = tea.KeyPressMsg{Code: tea.KeyEnter}
@@ -66,6 +67,8 @@ func TestScreen(t *testing.T) {
 		{"no_description", 60, 20, demoSession, presses(1)},
 		{"after_two", 60, 20, demoSession, presses(2)},
 		{"long_description", 60, 20, demoSession, presses(4)},
+		{"no_date", 60, 20, demoSession, presses(5)},
+		{"long_date_narrow", 34, 14, demoSession, nil},
 		{"everything", 60, 20, demoSession, presses(6)},
 		{"tall", 72, 40, demoSession, presses(3)},
 		{"narrow", 30, 14, demoSession, presses(4)},
@@ -109,7 +112,7 @@ func TestShare(t *testing.T) {
 }
 
 func TestEnterDoesNothingBeforeTheTasksLoad(t *testing.T) {
-	var m tea.Model = New(demoSession)
+	var m tea.Model = New(demoSession, time.Now)
 	m, _ = m.Update(enter)
 	if _, ok := m.(Model).Session(); ok {
 		t.Error("loaded without a load")
@@ -118,7 +121,7 @@ func TestEnterDoesNothingBeforeTheTasksLoad(t *testing.T) {
 
 func TestQuitKeys(t *testing.T) {
 	for _, key := range []tea.KeyPressMsg{{Code: 'q', Text: "q"}, {Code: tea.KeyEscape}, {Code: 'c', Mod: tea.ModCtrl}} {
-		_, cmd := New(demoSession).Update(key)
+		_, cmd := New(demoSession, time.Now).Update(key)
 		if cmd == nil {
 			t.Errorf("%s does not quit", key)
 			continue

@@ -52,6 +52,26 @@ the screen, so the ledger keeps a third; past that, the title gets at least
 half the room, and text that does not fit ends in `…`. The ledger's lines
 shift as the card grows and shrinks from task to task.
 
+**The card's edges carry its labels** (Will, 2026-11-11, over two rounds:
+the date *"to the top line"*, and in the bottom line *"query on the right,
+keys on the left"*): the task's date and the count (`3 of 127`) in the top
+edge; the keys and the query in the bottom edge; the line between the halves
+plain. When an edge is too short for both its labels, the date and the query
+are kept and the other gives way.
+
+**A blank line separates the ledger from the card** (Will, 2026-11-11: *"a
+bit more whitespace between the box and the first entry in the ledger"*).
+
+**The date reads as one of** *"how many days already overdue, today,
+tomorrow, the due date"*, *"then add the extra dot rule for recurring
+tasks"* (Will, 2026-11-11): `3 days overdue`, `1 day overdue`, `today`,
+`tomorrow`, `Mon 16 Nov` (`Mon 4 Jan 2027` in another year), then
+`· every monday`, Todoist's own wording of a recurring task's rule. Days are
+counted on the calendar from the day the tasks were loaded. A task with a
+time shows it after the day (`today 5:30pm`); that was chosen with the
+change, not by Will, and none of Will's tasks had one on 2026-11-11. A task
+with no date leaves the line plain (`triage.Due.Label`).
+
 Not yet decided, and settled live with Will (*Iterating on the UI with Will*
 in `AGENTS.md`): what a ledger line shows; what the screen shows when the
 list is empty or exhausted; colour; and any key besides Enter. The
@@ -101,7 +121,7 @@ refuses Todoist's comma operator (API documentation, read 2026-11-10).
   projects the two never disagreed (`todoist.SidebarOrder`).
 
 `login` and `logout`, alone, are commands rather than filters. The query sent
-is shown in the card's top edge, so a wrong resolution is visible. Escaping
+is shown in the card's bottom edge, so a wrong resolution is visible. Escaping
 and names with spaces have not yet been checked against Todoist's parser.
 
 ## Architecture

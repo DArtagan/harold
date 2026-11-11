@@ -4,6 +4,7 @@ package tui
 
 import (
 	"context"
+	"time"
 
 	tea "charm.land/bubbletea/v2"
 
@@ -14,14 +15,21 @@ import (
 // loop, so the screen draws while Todoist answers.
 type Loader func(ctx context.Context) (triage.Session, error)
 
+// Clock is where the UI learns the time: time.Now in use, a fixed one in
+// tests.
+type Clock func() time.Time
+
 // Model is the whole of the UI's state.
 type Model struct {
 	load    Loader
+	clock   Clock
 	state   State
 	session triage.Session
-	err     error
-	width   int
-	height  int
+	// today is when the tasks were loaded: due dates read against it.
+	today  time.Time
+	err    error
+	width  int
+	height int
 }
 
 // State is which of its phases the UI is in.
@@ -33,13 +41,17 @@ const (
 	Failed
 )
 
-type loadedMsg struct{ session triage.Session }
+type loadedMsg struct {
+	session triage.Session
+	today   time.Time
+}
 
 type failedMsg struct{ err error }
 
-// New returns the UI for the session load fetches.
-func New(load Loader) Model {
-	return Model{load: load}
+// New returns the UI for the session load fetches, reading the time from
+// clock.
+func New(load Loader, clock Clock) Model {
+	return Model{load: load, clock: clock}
 }
 
 // Session is the session as it stands, and false if it never loaded.
@@ -48,13 +60,13 @@ func (m Model) Session() (triage.Session, bool) {
 }
 
 func (m Model) Init() tea.Cmd {
-	load := m.load
+	load, clock := m.load, m.clock
 	return func() tea.Msg {
 		session, err := load(context.Background())
 		if err != nil {
 			return failedMsg{err}
 		}
-		return loadedMsg{session}
+		return loadedMsg{session: session, today: clock()}
 	}
 }
 
@@ -63,7 +75,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width, m.height = msg.Width, msg.Height
 	case loadedMsg:
-		m.state, m.session = Ready, msg.session
+		m.state, m.session, m.today = Ready, msg.session, msg.today
 	case failedMsg:
 		m.state, m.err = Failed, msg.err
 	case tea.KeyPressMsg:
@@ -80,7 +92,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() tea.View {
-	view := tea.NewView(Render(m.width, m.height, m.state, m.session, m.err))
+	view := tea.NewView(Render(m.width, m.height, m.state, m.session, m.today, m.err))
 	view.AltScreen = true
 	view.WindowTitle = "Harold"
 	return view

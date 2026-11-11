@@ -137,8 +137,8 @@ func SortForTriage(tasks []Task, projects []Project, loc *time.Location) {
 // before reports whether d is due before other. A nil or unreadable due date
 // is after every readable one.
 func (d *Due) before(other *Due, loc *time.Location) bool {
-	dayA, timeA, okA := d.when(loc)
-	dayB, timeB, okB := other.when(loc)
+	dayA, timeA, okA := d.When(loc)
+	dayB, timeB, okB := other.When(loc)
 	switch {
 	case !okA || !okB:
 		return okA && !okB
@@ -151,11 +151,12 @@ func (d *Due) before(other *Due, loc *time.Location) bool {
 	}
 }
 
-// when reads a due date in loc: the day it falls on, and its time, which is
-// zero for an all-day date. Todoist writes an all-day date as YYYY-MM-DD, a
-// floating time as YYYY-MM-DDTHH:MM:SS in the user's own zone, and a fixed
-// one in UTC, ending in Z (API documentation, Due dates).
-func (d *Due) when(loc *time.Location) (day, at time.Time, ok bool) {
+// When reads a due date in loc: the day it falls on, and its time, which is
+// zero for an all-day date, and false if there is no date it can read.
+// Todoist writes an all-day date as YYYY-MM-DD, a floating time as
+// YYYY-MM-DDTHH:MM:SS in the user's own zone, and a fixed one in UTC, ending
+// in Z (API documentation, Due dates).
+func (d *Due) When(loc *time.Location) (day, at time.Time, ok bool) {
 	if d == nil || d.Date == "" {
 		return time.Time{}, time.Time{}, false
 	}

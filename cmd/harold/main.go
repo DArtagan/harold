@@ -96,7 +96,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 	}
 
 	position := readPosition(*devState, stderr)
-	final, err := tea.NewProgram(tui.New(restoring(load, position))).Run()
+	final, err := tea.NewProgram(tui.New(restoring(load, position), time.Now)).Run()
 	if err != nil {
 		_, _ = fmt.Fprintln(stderr, "harold:", err)
 		return 1
@@ -166,8 +166,11 @@ func todoistLoader(client *todoist.Client, words []string) tui.Loader {
 				Project:     names[task.ProjectID],
 				Labels:      task.Labels,
 			}
-			if task.Due != nil {
-				tasks[i].Due = task.Due.String
+			if day, at, ok := task.Due.When(time.Local); ok {
+				tasks[i].Due = &triage.Due{Day: day, At: at}
+				if task.Due.IsRecurring {
+					tasks[i].Due.Rule = task.Due.String
+				}
 			}
 		}
 		return triage.New(query, tasks), nil
@@ -178,7 +181,7 @@ func todoistLoader(client *todoist.Client, words []string) tui.Loader {
 // resolved against the demo tasks' own projects and labels.
 func demoLoader(words []string) tui.Loader {
 	return func(context.Context) (triage.Session, error) {
-		tasks := demo.Tasks()
+		tasks := demo.Tasks(time.Now())
 		account := filter.Account{Inbox: "Inbox"}
 		seen := map[string]bool{}
 		for _, task := range tasks {

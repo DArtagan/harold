@@ -6,6 +6,12 @@
 // is a value: every transition returns a new one.
 package triage
 
+import (
+	"fmt"
+	"strings"
+	"time"
+)
+
 // Task is a task as Harold shows it.
 type Task struct {
 	ID          string
@@ -13,7 +19,57 @@ type Task struct {
 	Description string
 	Project     string
 	Labels      []string
-	Due         string
+	// Due is nil for a task with no date.
+	Due *Due
+}
+
+// Due is when a task is due, read in the local zone.
+type Due struct {
+	// Day is midnight on the day it is due.
+	Day time.Time
+	// At is its time, and zero for an all-day task.
+	At time.Time
+	// Rule is a recurring task's rule as Todoist words it ("every monday"),
+	// and empty for a task that does not recur.
+	Rule string
+}
+
+// Label is how a due date reads on the card, given the day it is: how many
+// days overdue, today, tomorrow, or the date; then its time, if it has one;
+// then a recurring task's rule (Will, 2026-11-11).
+func (d *Due) Label(today time.Time) string {
+	if d == nil {
+		return ""
+	}
+	var label string
+	switch days := dayNumber(today) - dayNumber(d.Day); {
+	case days > 1:
+		label = fmt.Sprintf("%d days overdue", days)
+	case days == 1:
+		label = "1 day overdue"
+	case days == 0:
+		label = "today"
+	case days == -1:
+		label = "tomorrow"
+	case d.Day.Year() == today.Year():
+		label = d.Day.Format("Mon 2 Jan")
+	default:
+		label = d.Day.Format("Mon 2 Jan 2006")
+	}
+	if !d.At.IsZero() {
+		label += " " + d.At.Format("3:04pm")
+	}
+	if d.Rule != "" {
+		label += " · " + strings.TrimSpace(d.Rule)
+	}
+	return label
+}
+
+// dayNumber counts days on the calendar, so the difference between two is
+// the days between them whatever the clock and daylight saving say.
+func dayNumber(t time.Time) int {
+	y, m, d := t.Date()
+	return int(time.Date(y, m, d, 0, 0, 0, 0, time.UTC).Unix() / 86400)
 }
 
 // Session is one pass through the tasks a query returned.
