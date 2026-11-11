@@ -84,9 +84,21 @@ refuses Todoist's comma operator (API documentation, read 2026-11-10).
 - **No arguments is `today | overdue`**, what Todoist's Today view shows
   (Will, 2026-11-11). The filter `today` alone is strictly due today: on
   2026-11-11 it returned 6 of Will's tasks, `overdue` 121, and
-  `today | overdue` 127. `harold today` keeps Todoist's meaning. Tasks come
-  in the order Todoist returns them, unsorted by Harold (Will, 2026-11-11:
-  see how the API's order feels before deciding).
+  `today | overdue` 127. `harold today` keeps Todoist's meaning.
+- **Tasks come by project, in the sidebar's order**: the Inbox, then the
+  project tree top to bottom, each project before its subprojects (Will,
+  2026-11-11: "the project order is a match"). **Within a project, by
+  priority, then by due date** (Will, 2026-11-11): p1 first (the API's `4`),
+  then the earliest date, no date last, and otherwise Todoist's order. On
+  one day, a task with a time comes before an all-day one, timed ones by
+  time; that tie was chosen with the change, not by Will, and on 2026-11-11
+  every one of Will's 126 tasks was all-day. A floating time is read in the
+  local zone and a fixed one converted to it (`todoist.SortForTriage`).
+  Todoist's own order felt *"quite a
+  jumbled feeling order"* (Will, 2026-11-11): Will's 127 switched project 65
+  times, and 14, the least 15 projects allow, once sorted. Siblings are
+  ordered by `child_order`, a tie broken by `order_key`; on Will's 58
+  projects the two never disagreed (`todoist.SidebarOrder`).
 
 `login` and `logout`, alone, are commands rather than filters. The query sent
 is shown in the card's top edge, so a wrong resolution is visible. Escaping

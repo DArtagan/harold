@@ -153,6 +153,10 @@ func todoistLoader(client *todoist.Client, words []string) tui.Loader {
 		if err != nil {
 			return triage.Session{}, err
 		}
+		// Todoist's own order mixes projects (Will, 2026-11-11: "quite a
+		// jumbled feeling order"), so tasks come by project, as the sidebar
+		// lists them, and within one by priority and then date.
+		todoist.SortForTriage(found, projects, time.Local)
 		tasks := make([]triage.Task, len(found))
 		for i, task := range found {
 			tasks[i] = triage.Task{
