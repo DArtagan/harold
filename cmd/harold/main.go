@@ -282,7 +282,10 @@ func logout(stdout, stderr io.Writer) int {
 		_, _ = fmt.Fprintln(stderr, "harold:", err)
 		return 1
 	}
-	_, _ = fmt.Fprintln(stdout, "Signed out.")
+	// Todoist's revoke endpoints ask for the client's secret, and Harold, a
+	// public client, has none (docs/design.md, Signing in).
+	_, _ = fmt.Fprintln(stdout, "Signed out on this machine. Todoist still lists Harold as connected:\n"+
+		"to revoke its access there too, remove it in Todoist's Settings, under Integrations.")
 	return 0
 }
 

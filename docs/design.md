@@ -180,7 +180,12 @@ only when the exchange returned one.
 
 `harold login` runs the flow and stores the client ID and tokens in the OS
 keyring (Secret Service on Linux, the Keychain on macOS); `harold logout`
-deletes the tokens.
+deletes the tokens. It does not revoke the grant at Todoist, and says so:
+both of Todoist's revoke endpoints (*Revoke Access Token Api*, and the
+RFC 7009 one) ask for the client's secret, which a public client has none of.
+Whether they accept a public client's ID alone is untested, since testing it
+revokes a live sign-in; until then the grant is removed in Todoist's
+settings.
 Any other command refreshes an expired token and stores the new pair.
 `HAROLD_TODOIST_TOKEN`, when set, is used instead of the keyring and is never
 refreshed. It is for where there is no keyring: the cluster, CI, a container.
