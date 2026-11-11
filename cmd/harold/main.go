@@ -37,7 +37,8 @@ const usage = `Harold for Todoist: triage a Todoist list one task at a time.
 Harold is not created by, affiliated with, or supported by Todoist.
 
 Usage:
-  harold [flags] [filter…]   triage the tasks a filter matches (default: today)
+  harold [flags] [filter…]   triage the tasks a filter matches (default:
+                             today | overdue, as Todoist's Today view)
   harold login               sign in to Todoist in the browser
   harold logout              forget the sign-in
 

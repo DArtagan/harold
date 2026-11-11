@@ -17,8 +17,8 @@ func TestResolve(t *testing.T) {
 		args []string
 		want string
 	}{
-		{"no arguments is today", nil, "today"},
-		{"a date passes to Todoist", []string{"today"}, "today"},
+		{"no arguments is Todoist's Today view", nil, "today | overdue"},
+		{"today alone is strictly today", []string{"today"}, "today"},
 		{"inbox names the Inbox project", []string{"inbox"}, "#Inbox"},
 		{"a project, case-insensitively", []string{"work"}, "#Work"},
 		{"a label", []string{"waiting"}, "@waiting"},
@@ -31,7 +31,7 @@ func TestResolve(t *testing.T) {
 		{"Todoist syntax alone passes verbatim", []string{"#Work | @waiting"}, "#Work | @waiting"},
 		{"Todoist syntax combined is parenthesised", []string{"work", "@waiting | p1"}, "#Work & (@waiting | p1)"},
 		{"a colon marks Todoist syntax", []string{"due before: friday"}, "due before: friday"},
-		{"blank arguments are no arguments", []string{" "}, "today"},
+		{"blank arguments are no arguments", []string{" "}, "today | overdue"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

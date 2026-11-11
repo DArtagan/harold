@@ -2,10 +2,13 @@
 // screenshots. No real task is ever committed (AGENTS.md); these stand in.
 package demo
 
-import "github.com/DArtagan/harold/internal/triage"
+import (
+	"github.com/DArtagan/harold/internal/filter"
+	"github.com/DArtagan/harold/internal/triage"
+)
 
-// Query is the query the demo tasks are shown under.
-const Query = "today"
+// Query is the query the demo tasks are shown under: harold's default.
+const Query = filter.DefaultQuery
 
 // Tasks returns the demo tasks. Between them they cover what the screen has to
 // handle: no description, a long one, several lines, a long title.

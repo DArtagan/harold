@@ -10,8 +10,10 @@ import (
 	"strings"
 )
 
-// DefaultQuery is the query when harold is given no arguments.
-const DefaultQuery = "today"
+// DefaultQuery is the query when harold is given no arguments: what Todoist's
+// own Today view shows, which includes overdue tasks. The filter `today` alone
+// does not.
+const DefaultQuery = "today | overdue"
 
 // MaxQueryLength is the longest query Todoist accepts.
 const MaxQueryLength = 1024

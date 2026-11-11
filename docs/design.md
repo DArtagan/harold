@@ -16,7 +16,8 @@ Made by Will on 2026-11-10, recorded so they are not relitigated:
   language other than Python. The web app gets a view of its own whichever
   framework the terminal uses, so the choice did not hang on the web.
 - **The arguments are Todoist's filter syntax, with bare words resolved**
-  (*Filters*). No arguments means `today`.
+  (*Filters*). No arguments means Todoist's Today view, `today | overdue`
+  (*Filters*).
 - **Read-only to begin with.** Enter moves a task into the ledger and changes
   nothing in Todoist. What triage does to a task is designed later.
 - **Public, MIT-licensed.**
@@ -79,7 +80,13 @@ refuses Todoist's comma operator (API documentation, read 2026-11-10).
 - **Adjacent words that name nothing stay together** as one phrase, for
   Todoist to read as a date or keyword: `harold work next week` is
   `#Work & next week` (Will, 2026-11-10).
-- **The terms are combined with `&`.** No arguments is `today`.
+- **The terms are combined with `&`.**
+- **No arguments is `today | overdue`**, what Todoist's Today view shows
+  (Will, 2026-11-11). The filter `today` alone is strictly due today: on
+  2026-11-11 it returned 6 of Will's tasks, `overdue` 121, and
+  `today | overdue` 127. `harold today` keeps Todoist's meaning. Tasks come
+  in the order Todoist returns them, unsorted by Harold (Will, 2026-11-11:
+  see how the API's order feels before deciding).
 
 `login` and `logout`, alone, are commands rather than filters. The query sent
 is shown in the card's top edge, so a wrong resolution is visible. Escaping

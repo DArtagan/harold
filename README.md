@@ -11,7 +11,8 @@ person's workflows, a terminal first and later a web app.
 Harold is not created by, affiliated with, or supported by Todoist.
 
 ```bash
-harold                         # today's tasks
+harold                         # Todoist's Today view: today and overdue
+harold today                   # due today only
 harold inbox                   # a bare word: a project, a label, or a date
 harold work today              # several words, all of them
 harold '#Work | @waiting'      # Todoist's own filter syntax, passed through
