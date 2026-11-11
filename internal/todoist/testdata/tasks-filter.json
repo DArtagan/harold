@@ -1,0 +1,29 @@
+{
+  "results": [
+    {
+      "id": "t1",
+      "content": "Water the ferns",
+      "description": "The big one by the window.",
+      "project_id": "p1",
+      "labels": [],
+      "priority": 1,
+      "due": {
+        "date": "2026-11-10",
+        "string": "today",
+        "is_recurring": false
+      }
+    },
+    {
+      "id": "t2",
+      "content": "Return the library books",
+      "description": "",
+      "project_id": "p2",
+      "labels": [
+        "waiting"
+      ],
+      "priority": 4,
+      "due": null
+    }
+  ],
+  "next_cursor": "p2"
+}

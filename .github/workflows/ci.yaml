@@ -22,6 +22,18 @@ jobs:
       - run: nix profile install nixpkgs#devenv
       - run: devenv test
 
+  # The package installs are built from. Its vendorHash goes stale with every
+  # change to go.sum, and this is where that is caught.
+  flake:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cachix/install-nix-action@v31
+      - run: nix build .#default -L
+      - run: ./result/bin/harold --version
+
   # Builds without pushing, so a broken Dockerfile fails here and not in the
   # release that would have published it.
   image:
