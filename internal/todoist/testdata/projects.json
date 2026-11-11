@@ -1,0 +1,15 @@
+{
+  "results": [
+    {
+      "id": "p1",
+      "name": "Inbox",
+      "inbox_project": true
+    },
+    {
+      "id": "p2",
+      "name": "Home Repairs",
+      "inbox_project": false
+    }
+  ],
+  "next_cursor": null
+}

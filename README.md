@@ -26,7 +26,8 @@ harold '#Work | @waiting'      # Todoist's own filter syntax, passed through
 ```bash
 devenv shell                   # Go and the tools the hooks run
 devenv test                    # every hook over every file, as CI runs it
-go run ./cmd/harold today      # the UI, from the checkout
+harold today                   # in the shell, the checkout's harold
+harold-dev --demo              # restarted on the same card on every save
 ```
 
 ## Licence

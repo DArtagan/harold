@@ -17,21 +17,34 @@ works. The screen in the design is a starting point; *"from there we'll
 iterate live on the design and functionality"* (Will), so the dev loop is part
 of the work, not an extra.
 
+## Where it stands
+
+Built on the `card-and-ledger` branch, 2026-11-10, everything below in code
+and tests: registration and login with PKCE, refresh that stores what it gets,
+the env override, the filter rules as Will settled them (*Filters*), the
+client, the card and the ledger with golden files, `harold-dev`, and the
+flake. Measured: the dev loop's 1.3 s (*The dev loop*); the flake builds and
+runs `harold --version`.
+
+In the devenv shell, `harold` runs the checkout's code (2026-11-11), so the
+commands below work there as written; the flake install waits (Will,
+2026-11-11: "hold off").
+
+Will's first `harold login`, 2026-11-11, was issued a refresh token
+(*Signing in*). Not yet checked, because each needs Will at the account:
+the hour-later refresh, and the other done-when conditions below. The screen is
+unreviewed: the first design round is next, from the golden files. Still to
+choose with Will: whether screenshots (`vhs`) are wanted beside the golden
+files. `vhs` was tried in the devenv shell and taken out: it brings a
+headless browser that took four minutes to fetch, which CI would pay on
+every run.
+
 ## Scope, in order
 
-1. **Sign-in** (*Signing in*). Before writing it, confirm what the design marks
-   unverified: that Todoist accepts a loopback redirect, on which ports, and
-   that a metadata-document client is issued a refresh token. Try it with a
-   throwaway document before building around it, and record the answer in the
-   design.
-   - The client metadata document, served from GitHub Pages at a URL under
-     `https://dartagan.github.io/harold/` (no custom domain redirects it,
-     checked 2026-11-10). `client_name` "Harold for Todoist"; `client_uri` the
-     repository. Enabling Pages is a change to the repository's settings:
-     confirm it with Will.
-   - `harold login` and `harold logout`; refresh on use; the keyring; the
-     `HAROLD_TODOIST_TOKEN` override.
-   - The scope is `data:read`.
+1. **Sign-in** (*Signing in*): registration, `harold login` and
+   `harold logout`, refresh on use, the keyring, and the
+   `HAROLD_TODOIST_TOKEN` override. The scope is `data:read`. Registration,
+   the loopback redirect and the refresh token are confirmed (*Signing in*).
 2. **The client and the filters** (*Filters*): tasks by filter with its
    cursor followed to the end, projects and labels for resolving bare words.
    Settle the design's proposed cases with Will and write the answers into

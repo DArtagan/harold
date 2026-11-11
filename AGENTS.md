@@ -9,8 +9,8 @@ sections a spec names before changing behaviour.
 
 ## Development environment
 
-[devenv](https://devenv.sh/) provides Go, golangci-lint, `gh`, `jq` and
-`skopeo`. `direnv` loads it on `cd`; otherwise `devenv shell`.
+[devenv](https://devenv.sh/) provides Go, golangci-lint, `gh`, `jq`, `skopeo`
+and `tmux`. `direnv` loads it on `cd`; otherwise `devenv shell`.
 
 ```bash
 go get <module>@latest         # a dependency
@@ -18,8 +18,19 @@ go test ./...                  # the tests
 go test ./... -update          # rewrite the golden files, then read the diff
 treefmt                        # format the tree
 devenv test                    # every hook over every tracked file, as CI runs it
-go run ./cmd/harold today      # the UI
+harold-dev --demo              # the UI, restarted on the same card on every save
+harold login                   # sign in, once per machine
+harold today                   # the UI, once
+nix build                      # the package installs are built from
 ```
+
+In the shell, `harold` is this checkout's, built from the working tree on
+each run; outside it, `harold` is whatever is installed. Both read the same
+keyring entries, so one sign-in serves both.
+
+A change to `go.sum` changes the flake's `vendorHash`: set it to
+`lib.fakeHash`, `nix build`, and copy the hash it reports. CI's flake job
+fails until that is done.
 
 The hooks are the ones `git commit` runs: treefmt, golangci-lint, `go test`,
 and `convco` on the commit message. Files git does not track are invisible to
@@ -36,8 +47,15 @@ in [`devenv.nix`](devenv.nix)).
 - **Verify with `devenv test`, not by printing files back.**
 - **Filter noisy commands** down to the lines that carry the result.
 - **Look at the screen, don't infer it.** A change to what Harold draws is
-  checked against its golden file or a screenshot (*Testing* in the design),
-  never from reading the view code.
+  checked against its golden file, or in a real terminal through `tmux`
+  (*Testing* in the design), never from reading the view code. To read the
+  screen while it runs:
+  `tmux new-session -d -s h -x 70 -y 20 "bash -c 'devenv shell -- harold-dev --demo'"`,
+  then `tmux send-keys -t h Enter` and `tmux capture-pane -p -t h`. tmux runs
+  the command in Will's login shell, fish, which rejects bash syntax such as
+  `$?`, and a tmux server already running lacks the shell's `PATH`: hence
+  `bash -c` and `devenv shell --`. Use `--demo`, so no real task enters the
+  session's context.
 - **A long build is investigated before it is waited on.** Nix offloads builds
   to remote builders whose logs devenv does not stream, so a build in progress
   and a hung one look alike.
