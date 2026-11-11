@@ -38,7 +38,10 @@ them; `git add -N` a new file first.
 
 Go is nixpkgs' default version, deliberately not pinned: devenv rebuilds its Go
 tools from source for any other, which no binary cache holds (see the comment
-in [`devenv.nix`](devenv.nix)).
+in [`devenv.nix`](devenv.nix)). The flake (`buildGo126Module`) and the
+Dockerfile (`golang:1.26`) build with the same minor version, so what is
+installed was built by the compiler the tests ran under. When devenv's
+default moves to a new minor version, move both with it.
 
 ### Working here as an agent
 

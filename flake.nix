@@ -18,7 +18,11 @@
     in
     {
       packages = forEach (pkgs: {
-        default = pkgs.buildGoModule rec {
+        # Go's minor version is the devenv shell's and the Dockerfile's, so the
+        # package installed is built by the compiler the tests ran under;
+        # nixos-unstable's default runs a minor ahead of devenv's. Moved
+        # together with those two.
+        default = pkgs.buildGo126Module rec {
           pname = "harold";
           # Written by release-please; see docs/releasing.md.
           version = "0.0.0"; # x-release-please-version
