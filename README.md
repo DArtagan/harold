@@ -2,8 +2,7 @@
 
 *Harold: I spent so much time with my todo list, my friends gave it a name.*
 
-Harold for Todoist is a terminal UI for going through a Todoist list one task at
-a time. The task under consideration fills a card at the foot of the screen;
+Harold is a terminal UI for going through a Todoist list one task at a time. The task under consideration fills a card at the foot of the screen;
 pressing Enter sends it up into the ledger, which fills from the bottom like a
 teletype, and brings the next task in. It is built for triage and for one
 person's workflows, a terminal first and later a web app.
@@ -16,7 +15,11 @@ harold today                   # due today only
 harold inbox                   # a bare word: a project, a label, or a date
 harold work today              # several words, all of them
 harold '#Work | @waiting'      # Todoist's own filter syntax, passed through
+harold login                   # sign in to Todoist in the browser, once
 ```
+
+Quote Todoist's syntax: the shell reads an unquoted `#Work` as a comment, and
+Harold is given nothing. A project's bare name needs no `#`: `harold work`.
 
 - [docs/design.md](docs/design.md): what it does and why
 - [docs/releasing.md](docs/releasing.md): how versions are cut

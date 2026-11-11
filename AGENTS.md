@@ -79,9 +79,12 @@ default moves to a new minor version, move both with it.
 ## Todoist's brand rules
 
 From *Brand usage* in Todoist's [API documentation](https://developer.todoist.com/api/v1/#section/Developing-with-Todoist/Integrations):
-"Todoist" is never Harold's primary name ("Harold for Todoist" is the form);
-every description of the app, including the OAuth consent screen's, says it is
-"not created by, affiliated with, or supported by Todoist"; and no Todoist
+"Todoist" is never Harold's primary name. Harold's name is plain "Harold"
+(Will, 2026-11-11, dropping "Harold for Todoist"); the rules suggest "x for
+Todoist" only for a name that mentions Todoist. Saying what Harold is for ("a
+terminal UI for Todoist") is allowed. Every description of the app says it is
+"not created by, affiliated with, or supported by Todoist": the README, the
+flake, `harold --help`, and the repository's GitHub description. No Todoist
 logo, mark or brand colour appears in the UI or the repository.
 
 ## Project workflow

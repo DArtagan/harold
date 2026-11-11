@@ -264,8 +264,45 @@ func TestLogoutKeepsTheRegistration(t *testing.T) {
 	if _, err := a.TokenSource(context.Background()); !errors.Is(err, ErrSignedOut) {
 		t.Errorf("signed in after logout: %v", err)
 	}
-	if id, _ := a.Store.Get(keyClient); id != "tdd_test" {
-		t.Errorf("client %q", id)
+	if client, _ := a.storedClient(); client.ID != "tdd_test" {
+		t.Errorf("client %+v", client)
+	}
+}
+
+// A client registered under an older name, or stored before registrations
+// recorded their name, is registered again at the next login, so the consent
+// screen shows the name Harold has now. Until then its token still refreshes
+// through it.
+func TestARenamedClientIsRegisteredAgainAtLogin(t *testing.T) {
+	for name, stored := range map[string]string{
+		"an older name": `{"id": "tdd_old", "name": "Harold for Todoist"}`,
+		"a bare old ID": "tdd_old",
+	} {
+		t.Run(name, func(t *testing.T) {
+			f := &fakeTodoist{}
+			a := setup(t, f)
+			_ = a.Store.Set(keyClient, stored)
+			_ = a.Store.Set(keyToken, `{"access_token": "old", "refresh_token": "r", "expiry": "2999-01-01T00:00:00Z"}`)
+
+			source, err := a.TokenSource(context.Background())
+			if err != nil {
+				t.Fatal(err)
+			}
+			if token, _ := source.Token(); token.AccessToken != "old" {
+				t.Errorf("before login, token %q", token.AccessToken)
+			}
+
+			result, err := login(t, a, browser(t, f, nil))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !result.Registered || f.registers != 1 || f.registered["client_name"] != ClientName {
+				t.Errorf("registered %v times as %v", f.registers, f.registered["client_name"])
+			}
+			if client, _ := a.storedClient(); client.ID != "tdd_test" || client.Name != ClientName {
+				t.Errorf("stored client %+v", client)
+			}
+		})
 	}
 }
 

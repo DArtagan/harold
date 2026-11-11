@@ -1,6 +1,6 @@
 # Design
 
-Harold for Todoist goes through a Todoist list one task at a time, *"optimized
+Harold goes through a Todoist list one task at a time, *"optimized
 for triage and my personal workflows"* (Will). It is a terminal UI first, and
 *"in the future growing to be an interactive web-app running on vulcanus"*,
 Will's Kubernetes cluster. Harold is not created by, affiliated with, or
@@ -155,9 +155,12 @@ the system browser, a loopback redirect, and no client secret.
 - **Registration.** On its first login, Harold registers a public client by
   `POST https://api.todoist.com/oauth/register` (RFC 7591; no authentication,
   rate-limited) with `token_endpoint_auth_method: "none"`, and keeps the
-  `tdd_…` client ID it is issued in the keyring. Each machine has its own.
-  `client_name` is "Harold for Todoist" and `client_uri` the repository: they
-  are what the consent screen shows.
+  `tdd_…` client ID it is issued in the keyring, with the name it registered
+  under. Each machine has its own. `client_name` is "Harold" and
+  `client_uri` the repository: they are what the consent screen shows, and
+  Todoist fixes them at registration, so a login whose stored client was
+  registered under another name registers again. Until that login, the old
+  client keeps refreshing the token it was issued.
 - **The redirect** is `http://127.0.0.1:<port>/callback`, on a port chosen
   free at login. Registered without a port, it matches any.
 - **Scopes**: Harold asks for `data:read` while it is read-only, so a write

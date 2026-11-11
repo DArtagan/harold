@@ -1,5 +1,5 @@
 {
-  description = "Harold for Todoist: triage a Todoist list one task at a time. Not created by, affiliated with, or supported by Todoist.";
+  description = "Harold: triage a Todoist list one task at a time. Not created by, affiliated with, or supported by Todoist.";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -52,7 +52,7 @@
           ];
 
           meta = {
-            description = "Harold for Todoist: triage a Todoist list one task at a time";
+            description = "Harold: triage a Todoist list one task at a time. Not created by, affiliated with, or supported by Todoist";
             homepage = "https://github.com/DArtagan/harold";
             license = pkgs.lib.licenses.mit;
             mainProgram = "harold";

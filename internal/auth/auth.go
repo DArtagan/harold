@@ -30,8 +30,9 @@ import (
 const Scope = "data:read"
 
 // ClientName is shown on Todoist's consent screen. Todoist's brand rules
-// require the "x for Todoist" form (AGENTS.md).
-const ClientName = "Harold for Todoist"
+// forbid Todoist as the primary name, and Harold's name does not mention it
+// (AGENTS.md).
+const ClientName = "Harold"
 
 // ClientURI is the repository, linked from the consent screen; its README
 // carries the disclaimer the brand rules require.
@@ -176,13 +177,16 @@ func (a *Auth) Logout() error {
 // TokenSource returns tokens for API calls, refreshing an expired one and
 // storing what the refresh returns.
 func (a *Auth) TokenSource(ctx context.Context) (oauth2.TokenSource, error) {
-	clientID, err := a.Store.Get(keyClient)
+	// The client the token was issued to, whatever its name now: a token is
+	// refreshed by the client that holds it.
+	client, err := a.storedClient()
 	if errors.Is(err, ErrNotFound) {
 		return nil, ErrSignedOut
 	}
 	if err != nil {
 		return nil, err
 	}
+	clientID := client.ID
 	stored, err := a.Store.Get(keyToken)
 	if errors.Is(err, ErrNotFound) {
 		return nil, ErrSignedOut
@@ -246,20 +250,48 @@ func (a *Auth) context(ctx context.Context) context.Context {
 	return context.WithValue(ctx, oauth2.HTTPClient, a.HTTP)
 }
 
-// client returns the stored client ID, registering one if there is none.
-func (a *Auth) client(ctx context.Context) (string, bool, error) {
-	id, err := a.Store.Get(keyClient)
-	if err == nil {
-		return id, false, nil
+// registration is a client Harold registered, as the Store keeps it.
+type registration struct {
+	ID string `json:"id"`
+	// Name is the client_name it was registered under, which Todoist shows
+	// on the consent screen and fixes at registration.
+	Name string `json:"name"`
+}
+
+// storedClient reads the stored registration. One stored as a bare client
+// ID, before registrations recorded their name, reads with no name.
+func (a *Auth) storedClient() (registration, error) {
+	stored, err := a.Store.Get(keyClient)
+	if err != nil {
+		return registration{}, err
 	}
-	if !errors.Is(err, ErrNotFound) {
+	var client registration
+	if json.Unmarshal([]byte(stored), &client) != nil || client.ID == "" {
+		return registration{ID: stored}, nil
+	}
+	return client, nil
+}
+
+// client returns the client ID to sign in with, registering a client when
+// none is stored or the stored one was registered under another name, so a
+// change to ClientName reaches the consent screen at the next login.
+func (a *Auth) client(ctx context.Context) (string, bool, error) {
+	stored, err := a.storedClient()
+	if err == nil && stored.Name == ClientName {
+		return stored.ID, false, nil
+	}
+	if err != nil && !errors.Is(err, ErrNotFound) {
 		return "", false, err
 	}
-	id, err = a.register(ctx)
+	id, err := a.register(ctx)
 	if err != nil {
 		return "", false, err
 	}
-	if err := a.Store.Set(keyClient, id); err != nil {
+	encoded, err := json.Marshal(registration{ID: id, Name: ClientName})
+	if err != nil {
+		return "", false, err
+	}
+	if err := a.Store.Set(keyClient, string(encoded)); err != nil {
 		return "", false, err
 	}
 	return id, true, nil

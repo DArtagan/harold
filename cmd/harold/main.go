@@ -1,4 +1,4 @@
-// Command harold is Harold for Todoist: a terminal UI for triaging a Todoist
+// Command harold is Harold: a terminal UI for triaging a Todoist
 // list one task at a time.
 package main
 
@@ -33,7 +33,7 @@ var version = "dev"
 // where there is no keyring. It is never refreshed.
 const tokenEnv = "HAROLD_TODOIST_TOKEN"
 
-const usage = `Harold for Todoist: triage a Todoist list one task at a time.
+const usage = `Harold: triage a Todoist list one task at a time.
 Harold is not created by, affiliated with, or supported by Todoist.
 
 Usage:
@@ -43,7 +43,9 @@ Usage:
   harold logout              forget the sign-in
 
 A filter is Todoist's own syntax ('#Work | @waiting'), or bare words: a
-project, a label, or a date (harold inbox, harold work next week).
+project, a label, or a date (harold inbox, harold work next week). Quote
+Todoist's syntax: the shell reads an unquoted #Work as a comment, and harold
+is then given nothing. A project's bare name needs no #: harold work.
 
 Flags:
 `
