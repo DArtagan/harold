@@ -34,15 +34,15 @@ func Render(width, height int, state State, session triage.Session, err error) s
 		return ansi.Truncate("Harold needs a larger window.", width, "…")
 	}
 
-	// The card's two halves share its height equally: a third of the
-	// screen, between 2 and 6 lines each.
-	half := clamp((height/3-3)/2, 2, 6)
-	card := renderCard(width, half, state, session, err)
+	// The card is as tall as its text, up to two-thirds of the screen, so
+	// the ledger keeps a third. Its three borders come out of that share.
+	room := height*2/3 - 3
+	card := renderCard(width, room, state, session, err)
 	ledger := renderLedger(width, height-len(card), session.Ledger())
 	return strings.Join(append(ledger, card...), "\n")
 }
 
-func renderCard(width, half int, state State, session triage.Session, err error) []string {
+func renderCard(width, room int, state State, session triage.Session, err error) []string {
 	inner := width - 4 // the border and a space either side
 
 	var title, description string
@@ -68,12 +68,15 @@ func renderCard(width, half int, state State, session triage.Session, err error)
 		count = fmt.Sprintf("%d of %d", shown, session.Total())
 	}
 
+	titleLines, descriptionLines := wrap(title, inner), wrap(description, inner)
+	titleRows, descriptionRows := share(len(titleLines), len(descriptionLines), room)
+
 	lines := []string{border("╭", query, count, "╮", width)}
-	for _, line := range block(title, inner, half) {
+	for _, line := range fit(titleLines, inner, titleRows) {
 		lines = append(lines, row(titleStyle.Render(line), inner))
 	}
 	lines = append(lines, borderStyle.Render("├"+strings.Repeat("─", width-2)+"┤"))
-	for _, line := range block(description, inner, half) {
+	for _, line := range fit(descriptionLines, inner, descriptionRows) {
 		lines = append(lines, row(line, inner))
 	}
 	return append(lines, border("╰", "enter next · q quit", "", "╯", width))
@@ -126,15 +129,37 @@ func row(content string, inner int) string {
 	return borderStyle.Render("│") + " " + content + strings.Repeat(" ", max(0, pad)) + " " + borderStyle.Render("│")
 }
 
-// block wraps text to width and fits it to exactly lines lines, ending the
-// last with an ellipsis when some is cut.
-func block(text string, width, lines int) []string {
+// wrap breaks text into lines no wider than width, keeping its own line
+// breaks.
+func wrap(text string, width int) []string {
 	var wrapped []string
 	if text != "" {
 		for _, paragraph := range strings.Split(text, "\n") {
 			wrapped = append(wrapped, strings.Split(ansi.Wrap(paragraph, width, ""), "\n")...)
 		}
 	}
+	return wrapped
+}
+
+// share divides room lines between the title and the description by what
+// each needs (Will, 2026-11-11: "dynamically size the two boxes to the text
+// contents of the task"). Each gets at least one line, so the card is always
+// divided in two. When both need more than there is, the title gets at least
+// half, and whichever needs less gives the other its spare.
+func share(titleNeeds, descriptionNeeds, room int) (int, int) {
+	titleNeeds, descriptionNeeds = max(1, titleNeeds), max(1, descriptionNeeds)
+	room = max(2, room)
+	if titleNeeds+descriptionNeeds <= room {
+		return titleNeeds, descriptionNeeds
+	}
+	title := min(titleNeeds, max((room+1)/2, room-descriptionNeeds))
+	return title, room - title
+}
+
+// fit makes wrapped exactly lines long, padding with blank lines, or cutting
+// it and ending the last line kept with an ellipsis.
+func fit(wrapped []string, width, lines int) []string {
+	wrapped = append([]string(nil), wrapped...)
 	if len(wrapped) > lines {
 		last := strings.TrimRight(wrapped[lines-1], " ")
 		if ansi.StringWidth(last) >= width {
@@ -147,5 +172,3 @@ func block(text string, width, lines int) []string {
 	}
 	return wrapped
 }
-
-func clamp(v, low, high int) int { return max(low, min(high, v)) }

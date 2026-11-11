@@ -63,6 +63,7 @@ func TestScreen(t *testing.T) {
 	}{
 		{"loading", 60, 20, nil, nil},
 		{"first_card", 60, 20, demoSession, nil},
+		{"no_description", 60, 20, demoSession, presses(1)},
 		{"after_two", 60, 20, demoSession, presses(2)},
 		{"long_description", 60, 20, demoSession, presses(4)},
 		{"everything", 60, 20, demoSession, presses(6)},
@@ -79,6 +80,30 @@ func TestScreen(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			golden.RequireEqual(t, screen(t, tt.width, tt.height, tt.load, tt.msgs...))
+		})
+	}
+}
+
+func TestShare(t *testing.T) {
+	tests := []struct {
+		name                       string
+		title, description, room   int
+		wantTitle, wantDescription int
+	}{
+		{"both fit", 2, 3, 10, 2, 3},
+		{"an empty half keeps a line", 1, 0, 10, 1, 1},
+		{"a long title takes the description's spare", 8, 2, 6, 4, 2},
+		{"a long description takes the title's spare", 1, 9, 6, 1, 5},
+		{"both long: the title gets half, rounded up", 9, 9, 7, 4, 3},
+		{"too little room still divides the card", 3, 3, 0, 1, 1},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			title, description := share(tt.title, tt.description, tt.room)
+			if title != tt.wantTitle || description != tt.wantDescription {
+				t.Errorf("share(%d, %d, %d) = %d, %d, want %d, %d",
+					tt.title, tt.description, tt.room, title, description, tt.wantTitle, tt.wantDescription)
+			}
 		})
 	}
 }

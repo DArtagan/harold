@@ -43,11 +43,19 @@ From the bottom up:
    card's task scrolls up into the ledger, which fills from the bottom upward
    like a teletype, and the next task takes the card.
 
+**The card is as tall as its task's text** (Will, 2026-11-11: *"dynamically
+size the two boxes to the text contents of the task"*). Each half takes the
+lines its text needs once wrapped, and at least one, so a task with no
+description still shows a divided card. The card takes at most two-thirds of
+the screen, so the ledger keeps a third; past that, the title gets at least
+half the room, and text that does not fit ends in `…`. The ledger's lines
+shift as the card grows and shrinks from task to task.
+
 Not yet decided, and settled live with Will (*Iterating on the UI with Will*
-in `AGENTS.md`): what
-a ledger line shows; the card's height and how a long description is cut;
-what the screen shows when the list is empty or exhausted; colour; and any key
-besides Enter.
+in `AGENTS.md`): what a ledger line shows; what the screen shows when the
+list is empty or exhausted; colour; and any key besides Enter. The
+two-thirds limit and the one-line minimum were chosen with the change above,
+not by Will.
 
 ## Filters
 
