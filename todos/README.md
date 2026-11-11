@@ -16,11 +16,20 @@ to by name, not number, so finishing one renumbers nothing.
 
 | # | spec | what | needs |
 |---|---|---|---|
-| 1 | [card-and-ledger](card-and-ledger.md) | `harold login`, then `harold [filter]` showing real tasks in the card and the ledger, with a dev loop fast enough to design the screen live; installed from the flake | — |
+| 1 | [flake-install](flake-install.md) | Harold on the PATH from its flake, pinned to a release, in Will's NixOS configuration | a first release |
+
+## Waiting on others
+
+- **Go 1.26.11.** The shell and the flake build with nixpkgs' Go 1.26.10,
+  which `govulncheck` reported on 2026-11-11 to carry GO-2026-6859, an
+  HTTP/1 server crash fixed in 1.26.11. Harold's only server is the login's
+  loopback callback, alive for one sign-in. No nixpkgs had 1.26.11 that day.
+  When devenv-nixpkgs has it, `devenv update` and `nix flake update`, and
+  `govulncheck` should then find nothing.
 
 ## After these
 
-Not yet specified, each waiting on what card-and-ledger teaches:
+Not yet specified:
 
 - **Triage actions**: what a key does to the task on the card (complete,
   reschedule, move, label), the first writes to Todoist, behind the single

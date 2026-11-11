@@ -5,3 +5,4 @@ request(s). It is the registry that stops a retired slug from being reused.
 
 | slug | landed | pull requests |
 |---|---|---|
+| card-and-ledger | 2026-11-11 | #1 |

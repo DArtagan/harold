@@ -143,6 +143,10 @@ The packages, so the web app can reuse everything but the view:
 | `internal/tui` | The terminal: wraps `triage` in a Bubble Tea model; `Render` draws the screen as a pure function of its state. | yes |
 | `cmd/harold` | Arguments, sign-in, and starting the TUI. | yes |
 
+Bubble Tea and Lip Gloss are v2, whose module paths are `charm.land/…/v2`,
+not the `github.com/charmbracelet` ones most examples show; v2's API differs
+(`View` returns a `tea.View`, keys arrive as `tea.KeyPressMsg`).
+
 The web app is planned as a server-rendered view over the same `triage`
 model, where a key press or a click is a message to `Update`. Nothing is built
 for it yet.
@@ -179,7 +183,12 @@ host with `400 invalid_request`, *Invalid redirect URI*. The documentation
 says redirect URIs must be HTTPS, *"localhost allowed for testing"*. The
 first real login, by Will on 2026-11-11, was issued a refresh token: `harold
 login` reported *"Harold keeps the sign-in fresh by itself"*, which it prints
-only when the exchange returned one.
+only when the exchange returned one. An hour later the expired token was
+refreshed on use, and the new pair stored, without a new login. Todoist
+refuses Harold's writes itself: with Harold's token, a write to a task ID that
+does not exist, which could change nothing, got `401 UNAUTHORIZED`
+(`error_code` 477), while a read of the same path got past authorization to
+`400 INVALID_ARGUMENT_VALUE` (2026-11-11).
 
 `harold login` runs the flow and stores the client ID and tokens in the OS
 keyring (Secret Service on Linux, the Keychain on macOS); `harold logout`
@@ -206,6 +215,11 @@ A personal API token from Todoist's settings works there too.
   `go test ./... -update` rewrites them; the diff is read before committing.
   The same test checks every screen fills the window exactly and no line is
   wider than it.
+- **Screenshots** are not taken. `vhs` would give images beside the golden
+  files, but it brings a headless browser that took four minutes to fetch,
+  which CI would pay on every run; whether they are wanted is Will's to
+  decide. `teatest` is not used either: its output is the raw stream of
+  escape codes, while the model's view is the screen as read.
 - **The real terminal**: Harold run in `tmux`, its screen read back with
   `tmux capture-pane`, for what a golden file cannot show: the alternate
   screen, key handling, restarts in the dev loop.
